@@ -22,6 +22,8 @@ private slots:
     bool save();
     void open();
     bool saveAs();
+
+    void openRecentFile();
     void spreadsheetModified();
     void updateStatusBar();
 
@@ -43,6 +45,7 @@ private:
     //更新RecentFileAction
     void updateRecentFileActions();
     bool okToContinue();
+    QString strippedName(const QString &fullFilename);
 
 private:
     Spreadsheet *spreadsheet;

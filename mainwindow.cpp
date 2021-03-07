@@ -29,12 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
     createToolBars();
     createStatusBar();
+    //读取上次存储的界面信息
+    readSettings();
 
 }
 
 void MainWindow::updateStatusBar()
 {
-
+    locationLabel->setText(spreadsheet->currentLocation());
+    formulaLabel->setText(spreadsheet->currentFormula());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -82,7 +85,23 @@ void MainWindow::open()
 
 bool MainWindow::saveAs()
 {
-    return true;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Spreadsheet"), ".",
+                                                    tr("Spreadsheet files(*.sp)"));
+    if(fileName.isEmpty())
+        return false;
+    return saveFile(fileName);
+}
+
+void MainWindow::openRecentFile()
+{
+     //打开新文档之前保存旧文档
+    if(okToContinue()) {
+        QAction *action = qobject_cast<QAction *>(sender()); //识别信号发送方
+        if(action) {
+            loadFile(action->data().toString());
+        }
+    }
 }
 
 void MainWindow::createActions()
@@ -112,7 +131,7 @@ void MainWindow::createActions()
                                       "name"));
         connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
     }
-
+    //最近打开文档
     for (int i = 0; i < MaxRecentFiles; ++i) {
         recentFileActions[i] = new QAction(this);
         recentFileActions[i]->setVisible(false);
@@ -233,7 +252,7 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu = menuBar()->addMenu(tr("&File"));  //该函数创建菜单项并返回该菜单变量的指针
     //关联menu到action
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
@@ -312,8 +331,8 @@ void MainWindow::createStatusBar()
     formulaLabel = new QLabel;
     formulaLabel->setIndent(3);
 
-    statusBar()->addWidget(locationLabel);
-    statusBar()->addWidget(formulaLabel, 1);
+    statusBar()->addWidget(locationLabel); //locationLabel将不会伸展
+    statusBar()->addWidget(formulaLabel, 1); //formulaLabel 将会伸展
 
     connect(spreadsheet, SIGNAL(currentCellChanged(int, int, int, int)),
             this, SLOT(updateStatusBar()));
@@ -325,16 +344,29 @@ void MainWindow::createStatusBar()
 
 void MainWindow::setCurrentFile(const QString &fileName)
 {
-//    curFile = fileName;
-//    setWindowModified(false);
+    curFile = fileName;
+    setWindowModified(false);
 
-//    QString shownName = tr("Untitled");
-//    if(!CurFile.isE)
+    QString shownName = tr("Untitled");
+    if(!curFile.isEmpty()) {
+        shownName = strippedName(curFile);
+        recentFiles.removeAll(curFile);
+        recentFiles.prepend(curFile);
+        updateRecentFileActions();
+    }
+    setWindowTitle(tr("%1[*] - %2").arg(shownName)
+                                   .arg(tr("Spreadsheet")));
 }
 
 bool MainWindow::saveFile(const QString &fileName)
 {
-
+    if(!spreadsheet->writeFile(fileName)) {
+        QMessageBox::warning(this, tr("spreedsheet"), tr("save file failed!"), QMessageBox::Yes);
+        return false;
+    }
+    setCurrentFile(fileName);
+    statusBar()->showMessage(tr("file saved"), 2000);
+    return true;
 }
 
 bool MainWindow::loadFile(const QString &fileName)
@@ -411,6 +443,11 @@ bool MainWindow::okToContinue()
         }
     }
     return true;
+}
+
+QString MainWindow::strippedName(const QString &fullFilename)
+{
+    return QFileInfo(fullFilename).fileName();
 }
 
 static QString strippedName(const QString &fullFileName)
