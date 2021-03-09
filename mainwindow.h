@@ -7,6 +7,7 @@ class Spreadsheet;
 class QAction;
 class QMenu;
 class QLabel;
+class FindDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,8 @@ private slots:
     bool save();
     void open();
     bool saveAs();
+    void find();
+    void goToCell();
 
     void openRecentFile();
     void spreadsheetModified();
@@ -49,6 +52,8 @@ private:
 
 private:
     Spreadsheet *spreadsheet;
+    FindDialog *findDialog;
+
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *slectSubMenu;

@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "spreadsheet.h"
+#include "finddialog.h"
+#include "gotocelldialog.h"
 
 #include <QIcon>
 #include <QAction>
@@ -12,6 +14,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QLineEdit>
 
 static QString strippedName(const QString &fullFileName);
 
@@ -91,6 +94,29 @@ bool MainWindow::saveAs()
     if(fileName.isEmpty())
         return false;
     return saveFile(fileName);
+}
+
+void MainWindow::find()
+{
+    if(!findDialog) {
+        findDialog = new FindDialog(this);
+        connect(findDialog, &FindDialog::findNext, spreadsheet, &Spreadsheet::findNext);
+        connect(findDialog, &FindDialog::findPrevious, spreadsheet, &Spreadsheet::findPrevious);
+    }
+    //置顶非模态对话框
+    findDialog->show();
+    findDialog->raise();
+    findDialog->activateWindow();
+}
+
+void MainWindow::goToCell()
+{
+    GoToCellDialog dialog(this);
+    if(dialog.exec()) {
+        QString str = dialog.lineEdit->text().toUpper();
+        spreadsheet->setCurrentCell(str.mid(1).toInt()-1,
+                                    str[0].unicode() - 'A');
+    }
 }
 
 void MainWindow::openRecentFile()

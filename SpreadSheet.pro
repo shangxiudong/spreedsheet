@@ -28,12 +28,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     spreadsheet.cpp \
-    cell.cpp
+    cell.cpp \
+    finddialog.cpp \
+    gotocelldialog.cpp
 
 HEADERS += \
         mainwindow.h \
     spreadsheet.h \
-    cell.h
+    cell.h \
+    finddialog.h \
+    gotocelldialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
