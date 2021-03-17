@@ -30,14 +30,19 @@ SOURCES += \
     spreadsheet.cpp \
     cell.cpp \
     finddialog.cpp \
-    gotocelldialog.cpp
+    gotocelldialog.cpp \
+    sortdialog.cpp
 
 HEADERS += \
         mainwindow.h \
     spreadsheet.h \
     cell.h \
     finddialog.h \
-    gotocelldialog.h
+    gotocelldialog.h \
+    sortdialog.h
+
+FORMS += \
+    sortdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

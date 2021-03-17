@@ -25,6 +25,8 @@ private slots:
     bool saveAs();
     void find();
     void goToCell();
+    void sort();
+    void about();
 
     void openRecentFile();
     void spreadsheetModified();
