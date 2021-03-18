@@ -16,6 +16,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QTime>
 
 static QString strippedName(const QString &fullFileName);
 QStringList MainWindow::recentFiles;
@@ -425,7 +426,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
         shownName = strippedName(curFile);
         recentFiles.removeAll(curFile);
         recentFiles.prepend(curFile);
-        updateRecentFileActions();
+        updateAllWindowRecentFiles();
     }
     setWindowTitle(tr("%1[*] - %2").arg(shownName)
                                    .arg(tr("Spreadsheet")));
@@ -461,7 +462,7 @@ void MainWindow::readSettings()
     restoreGeometry(settings.value("geometry").toByteArray());
 
     recentFiles = settings.value("recentFiles").toStringList();
-    updateRecentFileActions();
+    updateAllWindowRecentFiles();
 
     bool showGrid = settings.value("showGrid", true).toBool();
     showGridAction->setChecked(showGrid);
