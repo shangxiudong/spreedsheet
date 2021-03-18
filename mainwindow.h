@@ -51,6 +51,7 @@ private:
     void updateRecentFileActions();
     bool okToContinue();
     QString strippedName(const QString &fullFilename);
+    void updateAllWindowRecentFiles();
 
 private:
     Spreadsheet *spreadsheet;
@@ -70,6 +71,7 @@ private:
     QAction *openAction;
     QAction *saveAction;
     QAction *saveAsAction;
+    QAction *closeAction;
     QAction *exitAction;
     QAction *cutAction;
     QAction *copyAction;
@@ -98,7 +100,7 @@ private:
     QLabel *locationLabel;
     QLabel *formulaLabel;
 
-    QStringList recentFiles;
+    static QStringList recentFiles;
 };
 
 #endif // MAINWINDOW_H

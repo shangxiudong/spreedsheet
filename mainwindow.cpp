@@ -18,11 +18,12 @@
 #include <QLineEdit>
 
 static QString strippedName(const QString &fullFileName);
-
+QStringList MainWindow::recentFiles;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , spreadsheet(new Spreadsheet())
 {
+    setAttribute(Qt::WA_DeleteOnClose); //设置窗口关闭时，自动销毁内存
     //设置主窗体
     setCentralWidget(spreadsheet);
     setWindowIcon(QIcon(":/image/icon.png"));
@@ -61,10 +62,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::newFile()
 {
-    if(okToContinue()) {
-        spreadsheet->clear();
-        setCurrentFile("");
-    }
+//    if(okToContinue()) {
+//        spreadsheet->clear();
+//        setCurrentFile("");
+//    }
+    MainWindow *mainwin = new MainWindow;
+    mainwin->show();
 }
 
 bool MainWindow::save()
@@ -205,7 +208,14 @@ void MainWindow::createActions()
         exitAction = new QAction(tr("E&xit"), this);
         exitAction->setShortcut(tr("Ctrl+Q"));
         exitAction->setStatusTip(tr("Exit the application"));
-        connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+        connect(exitAction,  &QAction::triggered, qApp, &QApplication::closeAllWindows);
+
+        closeAction = new QAction(tr("&Close"), this);
+        closeAction->setShortcut(QKeySequence::Close);
+        closeAction->setStatusTip(tr("close current window"));
+        connect(closeAction, &QAction::triggered, this, &MainWindow::close);
+
+
 
         cutAction = new QAction(tr("Cu&t"), this);
         cutAction->setIcon(QIcon(":/image/cut.png"));
@@ -324,6 +334,7 @@ void MainWindow::createMenus()
     for (int i = 0; i < MaxRecentFiles; ++i)
         fileMenu->addAction(recentFileActions[i]);
     fileMenu->addSeparator();
+    fileMenu->addAction(closeAction);
     fileMenu->addAction(exitAction);
     //重复的其他功能组件
     {
@@ -512,9 +523,17 @@ QString MainWindow::strippedName(const QString &fullFilename)
     return QFileInfo(fullFilename).fileName();
 }
 
+void MainWindow::updateAllWindowRecentFiles()
+{
+    for(QWidget *win : QApplication::topLevelWidgets()) {
+        if(MainWindow *mainwin = qobject_cast<MainWindow *>(win))
+            mainwin->updateRecentFileActions();
+    }
+}
+
 static QString strippedName(const QString &fullFileName)
 {
-//    return QFileInfo(fullFileName).fileName();
+    return QFileInfo(fullFileName).fileName();
 }
 
 void MainWindow::spreadsheetModified()
