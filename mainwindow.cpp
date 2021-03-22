@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "spreadsheet.h"
+#include "myspreadsheet.h"
 #include "finddialog.h"
 #include "gotocelldialog.h"
 #include "sortdialog.h"

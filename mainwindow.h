@@ -53,6 +53,7 @@ private:
     QString strippedName(const QString &fullFilename);
     void updateAllWindowRecentFiles();
 
+
 private:
     Spreadsheet *spreadsheet;
     FindDialog *findDialog;

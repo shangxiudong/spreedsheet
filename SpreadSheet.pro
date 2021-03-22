@@ -27,19 +27,19 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    spreadsheet.cpp \
     cell.cpp \
     finddialog.cpp \
     gotocelldialog.cpp \
-    sortdialog.cpp
+    sortdialog.cpp \
+    myspreadsheet.cpp
 
 HEADERS += \
         mainwindow.h \
-    spreadsheet.h \
     cell.h \
     finddialog.h \
     gotocelldialog.h \
-    sortdialog.h
+    sortdialog.h \
+    myspreadsheet.h
 
 FORMS += \
     sortdialog.ui
