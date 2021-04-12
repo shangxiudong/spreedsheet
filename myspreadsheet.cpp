@@ -3,6 +3,7 @@
 #include "cell.h"
 #include <QFile>
 #include <QMessageBox>
+#include <QApplication>
 
 Spreadsheet::Spreadsheet(QWidget *parent) :
     QTableWidget(parent)
@@ -50,11 +51,59 @@ void Spreadsheet::clear()
 
 bool Spreadsheet::readFile(const QString &fileName)
 {
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, tr("spreadsheet"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(file.fileName())
+                             .arg(file.errorString()));
+        return false;
+    }
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_4_3);
+    quint32 magic;
+    in >> magic;
+    if(magic != magicNumber) {
+        QMessageBox::warning(this, tr("Spreadsheet"),
+                             tr("the file is not a spreadsheet file."));
+        return false;
+    }
+    clear();
 
+    quint16 row;
+    quint16 column;
+    QString str;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    while (!in.atEnd()) {
+        in >> row >> column >> str;
+        setFormula(row, column, str);
+    }
+    QApplication::restoreOverrideCursor();
+    return   true;
 }
 
 bool Spreadsheet::writeFile(const QString &fileName)
 {
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::warning(this, tr("Spreadsheet"),
+                             tr("Cannot write file %1:\n%2.")
+                             .arg(file.fileName())
+                             .arg(file.errorString()));
+        return false;
+    }
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_4_3);
+    out << quint32(magicNumber);  //自己的编码方式保存文件
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    for(int row=0; row<RowCount; ++row) {
+        for(int column=0; column < ColumnCount; ++column) {
+            QString str = formula(row, column);
+            if(!str.isEmpty())
+                out << quint16(row) << quint16(column) << str;
+        }
+    }
+    QApplication::restoreOverrideCursor();
     return true;
 }
 
